@@ -30,4 +30,4 @@ The *Access token* is valid for 60 days, i.e. you'll be able to programmatically
 
 Publish content on LinkedIn with a simple HTTP POST request having the *Access Token* in the header.
 
-    example.js
+    node example.js
