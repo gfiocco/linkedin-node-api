@@ -1,0 +1,17 @@
+{
+  "name": "linkedin-node-api",
+  "version": "1.0.0",
+  "description": "Share on LinkedIn with Node.js",
+  "main": "app.js",
+  "scripts": {
+    "test": "node example.js"
+  },
+  "keywords": [
+    "linkedin"
+  ],
+  "author": "Giuseppe Fiocco",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.1.0"
+  }
+}
