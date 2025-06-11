@@ -12,6 +12,7 @@ For this repository, I assumed a good number of people would want to get straigh
 - Set an authorized redirect URL, e.g. http://localhost:3000/auth;
 - *Test University* can be used as the company associated with the app without verification;
 - Copy the *Client ID* and *Client Secret* keys.
+- Use "https://www.linkedin.com/oauth/v2/authorization" as an value for AUTH_BASE_URL environment variable
 
 #### Step 2 | Get Access Token via 3-legged OAuth
 
