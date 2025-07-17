@@ -9,10 +9,11 @@ const fs = require('fs');
 const auth_base_url = process.env.AUTH_BASE_URL;
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
+const token = process.env.ACCESS_TOKEN;
 const redirect_uri = process.env.REDIRECT_URI;
 const response_type = 'code';
 const state = Math.random(); // WARNING: using weak random value for testing ONLY
-const scope = 'r_liteprofile r_emailaddress w_member_social';
+const scope = 'profile w_member_social openid email';
 
 const app = http.createServer(function (req, res) {
 
@@ -20,10 +21,11 @@ const app = http.createServer(function (req, res) {
 	let req_query = url.parse(req.url, true).query;
 
 	let redirect_uri_pathname = (new URL(redirect_uri)).pathname;
-	
+	console.log('Request URL: ' + redirect_uri_pathname);
 	// get authorization code - the server redirects to the linkedin sign-in page
+	console.log(req_pathname)
 	if(req_pathname == '/') {
-		let auth_url = auth_base_url + '?response_type=' + response_type + '&client_id=' + client_id + '&redirect_uri=' + encodeURIComponent(redirect_uri) + '&state=' + state + '&scope=' + encodeURIComponent(scope);
+		let auth_url = auth_base_url + '?response_type=' + response_type + '&client_id=' + client_id + '&redirect_uri=' + encodeURIComponent(redirect_uri) + '&code=' + token +  '&state=' + state + '&scope=' + encodeURIComponent(scope);
 		res.writeHead(302, {'Location': auth_url})
 		res.end();
 	}
@@ -32,7 +34,7 @@ const app = http.createServer(function (req, res) {
 
 		let req_code = req_query.code;
 		let req_state = req_query.state;
-
+		console.log("CODE:>>", req_query.code)
 		// WARNING: test req_state == state to prevent CSRF attacks
 
 		let path_query = 
@@ -46,10 +48,11 @@ const app = http.createServer(function (req, res) {
 		let hostname = 'www.linkedin.com';
 		let path = '/oauth/v2/accessToken?' + path_query;
 		let headers = {
-			"Content-Type": "x-www-form-urlencoded"
+			"Content-Type": "application/x-www-form-urlencoded"
 		};
 		let body = '';
 		_request(method, hostname, path, headers, body).then(r => {
+			console.log('Response: ' + r.status);
 			if(r.status == 200){
 				let access_token = JSON.parse(r.body).access_token;
 				let expires_in = Date.now() + (JSON.parse(r.body).expires_in * 1000); // token expiry in epoc format
@@ -103,6 +106,7 @@ function _request(method, hostname, path, headers, body){
 				resBody += data.toString('utf8');
 			});
 			res.on('end', () => {
+				console.log(resBody)
 				resolve({
 					"status": res.statusCode, 
 					"headers": res.headers, 

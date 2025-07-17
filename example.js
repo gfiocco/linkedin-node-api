@@ -28,7 +28,8 @@ getLinkedinId(accessToken).then(ownerId => {
 function getLinkedinId(accessToken) {
     return new Promise((res, rej) => {
         let hostname = 'api.linkedin.com';
-        let path = '/v2/me';
+        // let path = '/v2/me';
+        let path = '/v2/userinfo';
         let method = 'GET';
         let headers = {
             'Authorization': 'Bearer ' + accessToken,
@@ -37,7 +38,7 @@ function getLinkedinId(accessToken) {
         };
         let body = ''
         _request(method, hostname, path, headers, body).then(r => {
-            res(JSON.parse(r.body).id)
+            res(JSON.parse(r.body).sub)
         }).catch(e => rej(e))
     })
 }
@@ -46,25 +47,40 @@ function getLinkedinId(accessToken) {
 function postShare(accessToken, ownerId, title, text, shareUrl, shareThumbnailUrl) {
     return new Promise((res, rej) => {
         let hostname = 'api.linkedin.com';
-        let path = '/v2/shares';
+        let path = '/v2/ugcPosts';
         let method = 'POST';
+        // let body = {
+        //     "owner": "urn:li:person:" + ownerId,
+        //     "subject": title,
+        //     "text": {
+        //         "text": text // max 1300 characters
+        //     },
+        //     "content": {
+        //         "contentEntities": [{
+        //             "entityLocation": shareUrl,
+        //             "thumbnails": [{
+        //                 "resolvedUrl": shareThumbnailUrl
+        //             }]
+        //         }],
+        //         "title": title
+        //     },
+        //     "distribution": {
+        //         "linkedInDistributionTarget": {}
+        //     }
+        // }
         let body = {
-            "owner": "urn:li:person:" + ownerId,
-            "subject": title,
-            "text": {
-                "text": text // max 1300 characters
+            "author": "urn:li:person:" + ownerId,
+            "lifecycleState": "PUBLISHED",
+            "specificContent": {
+                "com.linkedin.ugc.ShareContent": {
+                    "shareCommentary": {
+                        "text": text
+                    },
+                    "shareMediaCategory": "NONE"
+                }
             },
-            "content": {
-                "contentEntities": [{
-                    "entityLocation": shareUrl,
-                    "thumbnails": [{
-                        "resolvedUrl": shareThumbnailUrl
-                    }]
-                }],
-                "title": title
-            },
-            "distribution": {
-                "linkedInDistributionTarget": {}
+            "visibility": {
+                "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
             }
         }
         let headers = {
